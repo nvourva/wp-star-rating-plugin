@@ -9,11 +9,10 @@
 }
 
 .rating-container {
-	/* remove inline-block whitespace */
 	font-size: 0;
-	/* flip the order so we can use the + and ~ combinators */
-	unicode-bidi: bidi-override;
-	direction: rtl;
+	display: flex;
+	justify-content: flex-end;
+	flex-direction: row-reverse;
 }
 
 .rating-container * {

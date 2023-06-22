@@ -54,7 +54,7 @@ class WP_Star_Rating {
 			$rating = intval( $_POST['rating'] );
 			add_comment_meta( $comment_id, 'rating', $rating );
 			$postid = get_comment( $comment_id )->comment_post_ID;
-			
+
 			if ( metadata_exists('post', $postid, 'post_average_rating') ) {
 				update_post_meta( $postid, 'post_average_rating', $this->ci_comment_rating_get_average_ratings( $postid ) );
 			} else {
@@ -104,7 +104,10 @@ class WP_Star_Rating {
 			if ( 0 === $i ) {
 				return false;
 			} else {
-				return round( $total / $i, 1 );
+				return array(
+					'rating' => round( $total / $i, 1 ),
+					'total'  => $i
+				);
 			}
 		} else {
 			return false;
@@ -119,12 +122,13 @@ class WP_Star_Rating {
 		if ( false === $this->ci_comment_rating_get_average_ratings( $post->ID ) ) {
 			return $content;
 		}
-		
+
 		$stars   = '';
-		$average = $this->ci_comment_rating_get_average_ratings( $post->ID );
+		$average = $this->ci_comment_rating_get_average_ratings( $post->ID )['rating'];
+		$people  = $this->ci_comment_rating_get_average_ratings( $post->ID )['total'];
 
 		for ( $i = 1; $i <= $average + 1; $i++ ) {
-			
+
 			$width = intval( $i - $average > 0 ? 20 - ( ( $i - $average ) * 20 ) : 20 );
 
 			if ( 0 === $width ) {
@@ -137,8 +141,8 @@ class WP_Star_Rating {
 				$stars .= '<span style="overflow:hidden; position:relative; left:-' . $width .'px;" class="dashicons dashicons-star-empty"></span>';
 			}
 		}
-		
-		$custom_content  = '<p class="average-rating">This post\'s average rating is: ' . $average .' ' . $stars .'</p>';
+
+		$custom_content  = '<p class="average-rating">This post was rated by ' . sprintf( _n( '%s person', '%s people', $people, 'text-domain' ), intval( $people ) ) .' and got an average rating of: ' . $average .' ' . $stars . '</p>';
 		$custom_content .= $content;
 		return $custom_content;
 	}
